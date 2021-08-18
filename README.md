@@ -1,4 +1,6 @@
-# fish-storybook-ui
+# Welcome to Storybook for Vue
+
+@storybook/vue@6.3.7 & vue@2.6.11
 
 ## Project setup
 ```
