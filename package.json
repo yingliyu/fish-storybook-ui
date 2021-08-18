@@ -1,13 +1,20 @@
 {
-  "name": "fish-storybook-ui",
+  "name": "fish-ui",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook -o ./docs"
+    "storybook": "start-storybook -p 6006 ",
+    "build-storybook": "rm -rf ./dist/docs && build-storybook -o ./dist/docs",
+    "build-storybook-docs": "build-storybook -s public --docs",
+    "docs:deploy": "scripts/build-gh.sh",
+    "gh-pages": "npm run build-storybook -- -o _gh-pages && gh-pages -d _gh-pages && rm -rf _gh-pages"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:yingliyu/fish-storybook-ui.git"
   },
   "dependencies": {
     "@babel/core": "^7.15.0",
