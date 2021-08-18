@@ -1,36 +1,44 @@
-# This is a basic workflow to help you get started with Actions
+name: Storybook deployer # Actions 名字
 
-name: CI
-
-# Controls when the workflow will run
-on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+on: # 触发条件
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches:
+      - master # 仅向 master 分支 push 时触发
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+  build: # job id
+    name: Build and publish # job 名，不写默认使用 job id
+    runs-on: ubuntu-latest # 运行环境，可选 ubuntu-latest, ubuntu-18.04, ubuntu-16.04, windows-latest, windows-2019, windows-2016, macOS-latest, macOS-10.14
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Setup  env
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          npm install
+      - name: Generate public files
+        run: |
+          npm run build-storybook
+
+      - name: Deploy
+        env:
+          GH_REF: github.com/yingliyu/fish-storybook-ui.github.io.git
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }} # github token
+        run: |
+          git config --global user.name "yingliyu"
+          git config --global user.email "404997046@qq.com"
+          git clone https://${GH_REF} .deploy_git
+          cd .deploy_git
+          git checkout gh-pages
+          cd ../
+          mv .deploy_git/.git/ ./dist/
+          cd ./dist/
+          git add .
+          git commit -m ":construction_worker:CI built at `date +"%Y-%m-%d %H:%M:%S"`"
+          # GitHub Pages
+          git push --force --quiet "https://${ACCESS_TOKEN}@${GH_REF}" gh-pages:gh-pages
